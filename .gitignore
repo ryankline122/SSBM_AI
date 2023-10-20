@@ -1,0 +1,12 @@
+.vscode/
+Languages/
+QtPlugins/
+Sys/
+python-embed/
+
+build_info.txt
+license.txt
+qt.conf
+
+*.exe
+*.dll
