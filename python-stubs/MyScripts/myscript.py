@@ -1,4 +1,4 @@
-from dolphin import event, gui, memory
+from dolphin import event, gui, memory, controller
 
 class SmashAgent():
     """
@@ -55,12 +55,15 @@ Script Entry Point
 red = 0xffff0000
 player1 = SmashAgent(player_index=1)
 
+
 while True:
     await event.frameadvance()
-
-    p1_char = memory.read_u32(0x803F0E08) / 257
-    # frame_counter += 1
+    buttons = controller.get_gc_buttons(1)
+    buttons["A"] = True
+    controller.set_gc_buttons(1, buttons)
+    await event.frameadvance()
+    
     # # draw on screen
     gui.draw_text((10, 10), red, f"P1: {player1.get_character()}")
-    # gui.draw_text((10, 10), red, f"Here")
+    # gui.draw_text((10, 10), red, f"C1: {controller.get_gc_buttons(0)}")
 
