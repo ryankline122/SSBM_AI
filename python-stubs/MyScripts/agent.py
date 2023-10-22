@@ -41,29 +41,7 @@ class SmashAgent():
         char_val = memory.read_u32(0x803F0E08) / 257
         
         if char_val in char_map:
+            print(f"Player 1's Selected Character is: {char_map[char_val]}")
             return char_map[char_val]
         else:
             return "Unknown" 
-
-
-"""
-
-Script Entry Point
-
-"""
-
-red = 0xffff0000
-player1 = SmashAgent(player_index=1)
-
-
-while True:
-    await event.frameadvance()
-    buttons = controller.get_gc_buttons(1)
-    buttons["A"] = True
-    controller.set_gc_buttons(1, buttons)
-    await event.frameadvance()
-    
-    # # draw on screen
-    gui.draw_text((10, 10), red, f"P1: {player1.get_character()}")
-    # gui.draw_text((10, 10), red, f"C1: {controller.get_gc_buttons(0)}")
-

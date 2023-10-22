@@ -3,6 +3,7 @@ Languages/
 QtPlugins/
 Sys/
 python-embed/
+MyScripts/__pycache__/
 
 build_info.txt
 license.txt
