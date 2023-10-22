@@ -10,5 +10,5 @@ from dolphin import event, gui, memory, controller
 player1 = agent.SmashAgent(player_index=1)
 while True:
     await event.frameadvance()
-    player1.get_character()
+    print(f"{player1.get_character()} is at {player1.get_position()}")
  
