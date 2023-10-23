@@ -1,10 +1,13 @@
+"""
+This module contains a class representing a player in SSBM
+"""
 from dolphin import event, gui, memory, controller
 import configparser
 import utils
 
-class SmashAgent():
+class BasePlayer():
     """
-    A class representing an AI agent in Super Smash Bros Melee.
+    A class representing a player in Super Smash Bros Melee.
     """
     def __init__(self, player_index):
         # Maps player number to string to access proper configuration

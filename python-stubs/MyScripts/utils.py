@@ -1,3 +1,6 @@
+"""
+Module containing helper functions for SSBM
+"""
 import configparser
 
 config = configparser.ConfigParser()
