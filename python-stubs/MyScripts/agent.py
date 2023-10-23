@@ -1,13 +1,20 @@
 from dolphin import event, gui, memory, controller
+import configparser
+import utils
 
 class SmashAgent():
     """
     A class representing an AI agent in Super Smash Bros Melee.
-    
-    Assuming agent is Player 1.
     """
     def __init__(self, player_index):
-        self.player_index = player_index
+        # Maps player number to string to access proper configuration
+        player_index_map = {
+            1: "P1",
+            2: "P2",
+            3: "P3",
+            4: "P4"
+        }
+        self.player_index = player_index_map[player_index]
 
     def get_character(self):
         """
@@ -40,10 +47,9 @@ class SmashAgent():
             23: 'Marth',
             24: 'Roy',
         }
-        char_val = memory.read_u32(0x803F0E08) / 257
+        char_val = memory.read_u32(utils.get_value_at(self.player_index, 'Character')) / 257
         
         if char_val in char_map:
-            print(f"Player 1's Selected Character is: {char_map[char_val]}")
             return char_map[char_val]
         else:
             return "Unknown" 
@@ -52,7 +58,7 @@ class SmashAgent():
         """
         Returns a string indicating the direction the agent is facing
         """
-        val = memory.read_f32(0x80C5CC0C)
+        val = memory.read_f32(utils.get_value_at(self.player_index, 'Direction'))
         
         if val == 1:
             return "right"
@@ -65,9 +71,9 @@ class SmashAgent():
         
         NOTE: Memory addresses may not always be consistent.
         """   
-        x_pos = memory.read_f32(0x80C5CC90)
-        y_pos = memory.read_f32(0x80C5CC94)
-        is_grounded = memory.read_u32(0x80C5CCC0)
+        x_pos = memory.read_f32(utils.get_value_at(self.player_index, 'X'))
+        y_pos = memory.read_f32(utils.get_value_at(self.player_index, 'Y'))
+        is_grounded = memory.read_u32(utils.get_value_at(self.player_index, 'isGrounded'))
         
         if is_grounded == 0 and y_pos < 1:
             y_pos = 0.0
@@ -78,4 +84,5 @@ class SmashAgent():
         """
         Returns the current percentage of the agent as a float.
         """
-        return memory.read_f32(0x80C5E410)
+        return memory.read_f32(utils.get_value_at(self.player_index, 'Percentage'))
+    
