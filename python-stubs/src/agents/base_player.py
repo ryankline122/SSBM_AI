@@ -2,8 +2,8 @@
 This module contains a class representing a player in SSBM
 """
 from dolphin import event, gui, memory, controller
+from common import utils
 import configparser
-import utils
 
 class BasePlayer():
     """
@@ -50,7 +50,8 @@ class BasePlayer():
             23: 'Marth',
             24: 'Roy',
         }
-        char_val = memory.read_u32(utils.get_value_at(self.player_index, 'Character')) / 257
+        char_val = hex(memory.read_u32(utils.get_value_at(self.player_index, 'Character')))
+        char_val = (int(char_val[2:], 16) & 0xFFFF) / 257
         
         if char_val in char_map:
             return char_map[char_val]
@@ -71,8 +72,6 @@ class BasePlayer():
     def get_position(self):
         """
         Returns the (x,y) position of the agent. 
-        
-        NOTE: Memory addresses may not always be consistent.
         """   
         x_pos = memory.read_f32(utils.get_value_at(self.player_index, 'X'))
         y_pos = memory.read_f32(utils.get_value_at(self.player_index, 'Y'))
