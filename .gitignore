@@ -5,6 +5,8 @@ Sys/
 python-embed/
 python-stubs/MyScripts/__pycache__/
 
+python-stubs/MyScripts/.venv/
+
 build_info.txt
 license.txt
 qt.conf
