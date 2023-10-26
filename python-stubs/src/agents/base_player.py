@@ -4,6 +4,7 @@ This module contains a class representing a player in SSBM
 from dolphin import event, gui, memory, controller
 from common import utils
 import configparser
+import sys
 
 class BasePlayer():
     """
@@ -18,6 +19,8 @@ class BasePlayer():
             4: "P4"
         }
         self.player_index = player_index_map[player_index]
+        self.controller_index = player_index - 1
+        self.buttons = controller.get_gc_buttons(self.controller_index)
 
     def get_character(self):
         """
@@ -87,4 +90,40 @@ class BasePlayer():
         Returns the current percentage of the agent as a float.
         """
         return memory.read_f32(utils.get_value_at(self.player_index, 'Percentage'))
+
+    def get_distance_to_opponent(self, opponent_pos):
+        """
+        Returns the difference between the two player positions.
+        
+        Positive x = to the left
+        Positive y = under
+        Negative x = to the right
+        Positive y = above 
+        """
+        curr_x, curr_y = self.get_position()
+        opp_x, opp_y = opponent_pos
+
+        return ((curr_x - opp_x), (curr_y - opp_y))
     
+    def action(self, action_type):
+        """
+        Performs the specified action. Available actions are:
+        
+        Movement:
+        ========================
+        - jump (X or Y button)
+        - left (StickX == -1.0)
+        - right (StickX == 1)
+
+        """
+        # Define actions here
+        if action_type == "jump":
+           self.buttons["X"] = True 
+        elif action_type == "left":
+            self.buttons["StickX"] = -1
+        elif action_type == "right":
+            self.buttons["StickX"] = 1
+        
+        
+        controller.set_gc_buttons(self.controller_index, self.buttons)
+        
