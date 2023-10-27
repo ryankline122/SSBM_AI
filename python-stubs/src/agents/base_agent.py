@@ -1,14 +1,14 @@
 """
-This module contains a class representing a player in SSBM
+This module contains a class representing a agent in SSBM
 """
 from dolphin import event, gui, memory, controller
 from common import utils
 import configparser
 import sys
 
-class BasePlayer():
+class BaseAgent():
     """
-    A class representing a player in Super Smash Bros Melee.
+    A class representing an agent in Super Smash Bros Melee.
     """
     def __init__(self, player_index):
         # Maps player number to string to access proper configuration
@@ -116,6 +116,9 @@ class BasePlayer():
         - right (StickX == 1)
 
         """
+        self.reset_buttons()
+        print("Before: " + str(self.buttons))
+        
         # Define actions here
         if action_type == "jump":
            self.buttons["X"] = True 
@@ -124,6 +127,34 @@ class BasePlayer():
         elif action_type == "right":
             self.buttons["StickX"] = 1
         
+        print("After: " + str(self.buttons))
+        
+        controller.set_gc_buttons(self.controller_index, self.buttons)
+        
+    def set_buttons(self, button, value):
+        self.buttons[button] = value
+        
+    def reset_buttons(self):
+        self.buttons = {
+            'A': False,
+            'B': False,
+            'X': False,
+            'Y': False,
+            'Z': False,
+            'Start': False,
+            'Up': False,
+            'Down': False,
+            'Left': False,
+            'Right': False,
+            'L': False,
+            'R': False,
+            'StickX': 0.0,
+            'StickY': 0.0,
+            'CStickX': 0.0,
+            'CStickY': 0.0,
+            'TriggerLeft': 0.0,
+            'TriggerRight': 0.0,
+        }
         
         controller.set_gc_buttons(self.controller_index, self.buttons)
         
