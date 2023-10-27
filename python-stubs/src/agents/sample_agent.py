@@ -2,6 +2,9 @@ from .base_agent import BaseAgent
 from dolphin import controller, event
 
 class SampleAgent(BaseAgent):
+    """
+    A Sample Agent class to help get you started creating your own agents.
+    """
     def __init__(self, player_index, gamestate):
         super().__init__(player_index, gamestate)
         self.jumped_at_frame = 0
@@ -48,4 +51,3 @@ class SampleAgent(BaseAgent):
             super().set_buttons("StickY", -1.0)
         else:
             super().set_buttons("StickY", 0.0)
-

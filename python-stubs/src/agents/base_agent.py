@@ -122,7 +122,6 @@ class BaseAgent():
 
         """
         self.reset_buttons()
-        # print("Before: " + str(self.buttons))
         
         # Define actions here
         if action_type == "jump":
@@ -131,8 +130,6 @@ class BaseAgent():
             self.buttons["StickX"] = -1
         elif action_type == "right":
             self.buttons["StickX"] = 1
-        
-        # print("After: " + str(self.buttons))
         
         controller.set_gc_buttons(self.controller_index, self.buttons)
         

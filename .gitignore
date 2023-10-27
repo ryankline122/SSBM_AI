@@ -5,6 +5,7 @@ Sys/
 python-embed/
 python-stubs/src/__pycache__/
 python-stubs/src/agents/__pycache__/
+python-stubs\src\common\__pycache__/
 python-stubs/src/.venv/
 
 build_info.txt
