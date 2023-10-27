@@ -138,6 +138,9 @@ class BaseAgent():
         
     def set_buttons(self, button, value):
         self.buttons[button] = value
+    
+    def get_buttons(self):
+        return self.buttons
         
     def reset_buttons(self):
         self.buttons = {

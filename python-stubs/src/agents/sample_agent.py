@@ -14,37 +14,38 @@ class SampleAgent(BaseAgent):
         controller.set_gc_buttons(self.controller_index, buttons)
     
     def go_to(self, coords):
-        """
-        Takes actions to approach the given
-        """
+        # Get the distance and frames since the last jump
         diff_x, diff_y = super().get_distance_to_opponent(coords)
-        delta_x, delta_y = super().get_position(isDelta=True)
-        x, y = super().get_position()
-        
         frames_since_last_jump = self.gamestate.frame - self.jumped_at_frame
-        
-        if self.jumped == True and frames_since_last_jump > 20:
+
+        # Reset the jumped flag if it's been more than 20 frames since the last jump
+        if self.jumped and frames_since_last_jump > 20:
             self.jumped = False
         
-        if diff_x < -20:
+        # Keeps agent from getting stuck when oppoent is on end of platform
+        target_x = 10 if diff_y >= 0 else 5
+
+        # Adjust X position
+        if diff_x < -target_x:
             super().action("right")
-        elif diff_x > 20:
+        elif diff_x > target_x:
             super().action("left")
-            
-        if -20 < diff_x < 20:
+        else:
             super().set_buttons("StickX", 0.0)
             controller.set_gc_buttons(self.controller_index, self.buttons)
-        
-            if diff_y < -10 and not self.jumped:
-                super().action("jump")
-                self.jumped = True
-                self.jumped_at_frame = self.gamestate.frame
-                
-            elif frames_since_last_jump > 4 and self.jumped:
-                super().set_buttons("X", False)
-                controller.set_gc_buttons(self.controller_index, self.buttons)
 
-            if diff_y > 10:
-                super().set_buttons("StickY", -1.0)
-            else:
-                super().set_buttons("StickY", 0.0)
+        # Handle jumping
+        if diff_y < -10 and not self.jumped:
+            super().action("jump")
+            self.jumped = True
+            self.jumped_at_frame = self.gamestate.frame
+        elif frames_since_last_jump > 5 and self.jumped:
+            super().set_buttons("X", False)
+            controller.set_gc_buttons(self.controller_index, self.buttons)
+
+        # Adjust Y position
+        if diff_y > 10 and super().get_buttons()['StickY'] == 0.0:
+            super().set_buttons("StickY", -1.0)
+        else:
+            super().set_buttons("StickY", 0.0)
+

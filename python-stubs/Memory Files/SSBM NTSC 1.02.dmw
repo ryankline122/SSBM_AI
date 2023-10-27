@@ -1352,7 +1352,7 @@
                                 },
                                 {
                                     "address": "80453130",
-                                    "baseIndex": 1,
+                                    "baseIndex": 0,
                                     "label": "041 - Ground/Air state, (0x00000000 on ground, 0x00000001 in air. Changing does nothing.)",
                                     "pointerOffsets": [
                                         "2C",
