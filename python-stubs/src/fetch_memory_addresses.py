@@ -22,6 +22,8 @@ def update_config(player_name, player_base_address):
     config.set(player_name, 'Direction', player_addresses['direction_addr'])
     config.set(player_name, 'X', player_addresses['x_pos_addr'])
     config.set(player_name, 'Y', player_addresses['y_pos_addr'])
+    config.set(player_name, 'X_delta', player_addresses['x_delta_pos_addr'])
+    config.set(player_name, 'Y_delta', player_addresses['y_delta_pos_addr'])
     config.set(player_name, 'isGrounded', player_addresses['is_grounded_addr'])
     config.set(player_name, 'Percentage', player_addresses['percentage_addr'])
 
@@ -39,6 +41,8 @@ def get_player_addresses(player_base_address):
     direction_addr = dme.follow_pointers(player_base_address, [0x2C, 0x2C])
     x_pos_addr = dme.follow_pointers(player_base_address, [0x2C, 0xB0])
     y_pos_addr = dme.follow_pointers(player_base_address, [0x2C, 0xB4])
+    x_delta_pos_addr = dme.follow_pointers(player_base_address, [0x2C, 0xCB])
+    y_delta_pos_addr = dme.follow_pointers(player_base_address, [0x2C, 0xCC])
     is_grounded_addr = dme.follow_pointers(player_base_address, [0x2C, 0xE0])
     percentage_addr = dme.follow_pointers(player_base_address, [0x2C, 0x1830])
 
@@ -46,6 +50,8 @@ def get_player_addresses(player_base_address):
         'direction_addr': hex(direction_addr).lstrip('0x'),
         'x_pos_addr': hex(x_pos_addr).lstrip('0x'),
         'y_pos_addr': hex(y_pos_addr).lstrip('0x'),
+        'x_delta_pos_addr': hex(x_delta_pos_addr).lstrip('0x'),
+        'y_delta_pos_addr': hex(y_delta_pos_addr).lstrip('0x'),
         'is_grounded_addr': hex(is_grounded_addr).lstrip('0x'),
         'percentage_addr': hex(percentage_addr).lstrip('0x')
     }

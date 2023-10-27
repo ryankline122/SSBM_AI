@@ -10,7 +10,7 @@ class BaseAgent():
     """
     A class representing an agent in Super Smash Bros Melee.
     """
-    def __init__(self, player_index):
+    def __init__(self, player_index, gamestate):
         # Maps player number to string to access proper configuration
         player_index_map = {
             1: "P1",
@@ -21,6 +21,7 @@ class BaseAgent():
         self.player_index = player_index_map[player_index]
         self.controller_index = player_index - 1
         self.buttons = controller.get_gc_buttons(self.controller_index)
+        self.gamestate = gamestate
 
     def get_character(self):
         """
@@ -72,14 +73,18 @@ class BaseAgent():
         elif val == -1:
             return "left"
         
-    def get_position(self):
+    def get_position(self, isDelta=False):
         """
         Returns the (x,y) position of the agent. 
-        """   
-        x_pos = memory.read_f32(utils.get_value_at(self.player_index, 'X'))
-        y_pos = memory.read_f32(utils.get_value_at(self.player_index, 'Y'))
-        is_grounded = memory.read_u32(utils.get_value_at(self.player_index, 'isGrounded'))
+        """
+        if not isDelta: 
+            x_pos = memory.read_f32(utils.get_value_at(self.player_index, 'X'))
+            y_pos = memory.read_f32(utils.get_value_at(self.player_index, 'Y'))
+        else:
+            x_pos = memory.read_f32(utils.get_value_at(self.player_index, 'X_delta'))
+            y_pos = memory.read_f32(utils.get_value_at(self.player_index, 'Y_delta'))
         
+        is_grounded = memory.read_u32(utils.get_value_at(self.player_index, 'isGrounded'))
         if is_grounded == 0 and y_pos < 1:
             y_pos = 0.0
         
@@ -117,7 +122,7 @@ class BaseAgent():
 
         """
         self.reset_buttons()
-        print("Before: " + str(self.buttons))
+        # print("Before: " + str(self.buttons))
         
         # Define actions here
         if action_type == "jump":
@@ -127,7 +132,7 @@ class BaseAgent():
         elif action_type == "right":
             self.buttons["StickX"] = 1
         
-        print("After: " + str(self.buttons))
+        # print("After: " + str(self.buttons))
         
         controller.set_gc_buttons(self.controller_index, self.buttons)
         
