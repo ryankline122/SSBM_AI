@@ -67,5 +67,20 @@ class GameState():
         else:
             return True
     
+    def is_game_paused(self):
+        if memory.read_u32(utils.get_value_at('Global', 'game_pause')) == 0:
+            return False
+        else:
+            return True
+    
+    def get_time_remaining(self):
+        """
+        Returns remaining time in seconds
+        """
+        if self.is_game_active():
+            return memory.read_u32(utils.get_value_at('Global', 'game_time'))
+        else:
+            return 0.0
+    
     def update_frame(self):
         self.frame += 1

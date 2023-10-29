@@ -72,6 +72,10 @@ class BaseAgent():
         elif val == -1:
             return "left"
         
+    def get_stocks(self):
+        val = hex(memory.read_u32(utils.get_value_at(self.player_index, 'stocks')))
+        return val[2]
+    
     def get_position(self, isDelta=False):
         """
         Returns the (x,y) position of the agent. 
