@@ -28,7 +28,7 @@ while True:
     # gamestate.get_player_info()
     # print(gamestate.get_time_remaining())
     
-    print(player3.get_stocks())
+    print(player1.get_action_state())
     
     # if gamestate.frame % 120 == 0:
     #     player3.action("grab")

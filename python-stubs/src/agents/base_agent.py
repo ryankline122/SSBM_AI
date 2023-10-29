@@ -76,6 +76,9 @@ class BaseAgent():
         val = hex(memory.read_u32(utils.get_value_at(self.player_index, 'stocks')))
         return val[2]
     
+    def get_action_state(self):
+        return memory.read_u32(utils.get_value_at(self.player_index, 'action_state'))
+    
     def get_position(self, isDelta=False):
         """
         Returns the (x,y) position of the agent. 

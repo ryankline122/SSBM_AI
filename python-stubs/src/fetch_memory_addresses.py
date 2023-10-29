@@ -26,6 +26,7 @@ def update_config(player_name, player_base_address):
     config.set(player_name, 'Y_delta', player_addresses['y_delta_pos_addr'])
     config.set(player_name, 'isGrounded', player_addresses['is_grounded_addr'])
     config.set(player_name, 'Percentage', player_addresses['percentage_addr'])
+    config.set(player_name, 'action_state', player_addresses['action_state_addr'])
 
     # Write the changes back to the config.ini file
     with open('python-stubs\src\config.ini', 'w') as configfile:
@@ -45,6 +46,7 @@ def get_player_addresses(player_base_address):
     y_delta_pos_addr = dme.follow_pointers(player_base_address, [0x2C, 0xCC])
     is_grounded_addr = dme.follow_pointers(player_base_address, [0x2C, 0xE0])
     percentage_addr = dme.follow_pointers(player_base_address, [0x2C, 0x1830])
+    action_state_addr = dme.follow_pointers(player_base_address, [0x2c, 0x10])
 
     return {
         'direction_addr': hex(direction_addr).lstrip('0x'),
@@ -53,9 +55,9 @@ def get_player_addresses(player_base_address):
         'x_delta_pos_addr': hex(x_delta_pos_addr).lstrip('0x'),
         'y_delta_pos_addr': hex(y_delta_pos_addr).lstrip('0x'),
         'is_grounded_addr': hex(is_grounded_addr).lstrip('0x'),
-        'percentage_addr': hex(percentage_addr).lstrip('0x')
+        'percentage_addr': hex(percentage_addr).lstrip('0x'),
+        'action_state_addr': hex(action_state_addr).lstrip('0x')
     }
-
 
 def setup():
     """

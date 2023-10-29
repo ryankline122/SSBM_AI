@@ -40,7 +40,6 @@ class GameState():
         
         """
         
-        
         self.frame = 0
         self.players = players
         self.Q = defaultdict(dict)
@@ -50,7 +49,7 @@ class GameState():
         pos = player.get_position()
         direction = player.get_facing_direction()
         percentage = player.get_percentage()
-        stocks = 0 # TODO
+        stocks = player.get_stocks()
         action_state = 0 # TODO
         
         return [pos, direction, percentage, stocks, action_state]
