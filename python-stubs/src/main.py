@@ -16,15 +16,22 @@ while True:
     await event.frameadvance()
     gamestate.update_frame()
 
-    print(f"Player 1:")
-    print(f"{player1.get_character()}")
-    print(f"{player1.get_percentage()}")
-    print(f"{player1.get_position()}")
+    # print(f"Player 1:")
+    # print(f"{player1.get_character()}")
+    # print(f"{player1.get_percentage()}")
+    # print(f"{player1.get_position()}")
  
-    print(f"Player 3:")
-    print(f"{player3.get_character()}")
-    print(f"{player3.get_percentage()}")
-    print(f"{player3.get_position()}")
+    # print(f"Player 3:")
+    # print(f"{player3.get_character()}")
+    # print(f"{player3.get_percentage()}")
+    # print(f"{player3.get_position()}")
     
-    player3.go_to(player1.get_position())
+    if gamestate.frame % 120 == 0:
+        player3.action("grab")
+    else:
+        player3.reset_buttons()
+    
+    print(player3.buttons)
+    
+    # player3.go_to(player1.get_position())
     

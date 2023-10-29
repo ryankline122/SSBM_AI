@@ -116,21 +116,78 @@ class BaseAgent():
         
         Movement:
         ========================
-        - jump (X or Y button)
-        - left (StickX == -1.0)
-        - right (StickX == 1)
+        - jump
+        - left
+        - right
 
+        Attack:
+        ========================
+        - neutral
+        - special
+        - tilt_up
+        - tilt_down
+        - tilt_left
+        - tilt_right
+        - smash_up
+        - smash_down
+        - smash_left
+        - smash_right
+
+        Other:
+        ========================
+        - shield
+        - grab
         """
         self.reset_buttons()
         
-        # Define actions here
+        # Movement
         if action_type == "jump":
            self.buttons["X"] = True 
         elif action_type == "left":
             self.buttons["StickX"] = -1
         elif action_type == "right":
             self.buttons["StickX"] = 1
-        
+            
+        # Neutral Attacks
+        elif action_type == "neutral":
+            self.buttons["A"] = True
+        elif action_type == "special":
+            self.buttons["B"] = True
+            
+        # Tilt Attacks - for left and right check facing direction
+        elif action_type == "tilt_left":
+            self.buttons["StickX"] = -0.4
+            self.buttons["A"] = True
+        elif action_type == "tilt_right":
+            self.buttons["StickX"] = 0.4
+            self.buttons["A"] = True
+        elif action_type == "tilt_up":
+            self.buttons["StickY"] = 0.4
+            self.buttons["A"] = True
+        elif action_type == "tilt_down":
+            self.buttons["StickY"] = -0.4
+            self.buttons["A"] = True
+
+        # Smash Attacks
+        elif action_type == "smash_left":
+            self.buttons["StickX"] = -1
+            self.buttons["A"] = True
+        elif action_type == "smash_right":
+            self.buttons["StickX"] = 1
+            self.buttons["A"] = True
+        elif action_type == "smash_up":
+            self.buttons["StickY"] = 1
+            self.buttons["A"] = True
+        elif action_type == "smash_down":
+            self.buttons["StickY"] = -1
+            self.buttons["A"] = True
+
+        # Other
+        elif action_type == "shield":
+            self.buttons["TriggerLeft"] = 1
+        elif action_type == "grab":
+            self.buttons["Z"] = True
+            
         controller.set_gc_buttons(self.controller_index, self.buttons)
         
     def set_buttons(self, button, value):
@@ -138,7 +195,7 @@ class BaseAgent():
     
     def get_buttons(self):
         return self.buttons
-        
+
     def reset_buttons(self):
         self.buttons = {
             'A': False,
@@ -162,4 +219,3 @@ class BaseAgent():
         }
         
         controller.set_gc_buttons(self.controller_index, self.buttons)
-        
