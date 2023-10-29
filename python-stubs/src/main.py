@@ -9,9 +9,14 @@ from agents.sample_agent import SampleAgent
 from common.gamestate import GameState
 from dolphin import event, gui, memory, controller
 
+from qtesting import QTraining
+
 player1 = BaseAgent(player_index=1)
 player3 = BaseAgent(player_index=3) # P2 points to the same memory address as P1 for some reason, so CPU will be P3
 gamestate = GameState(players=[player1, player3])
+
+tmp = QTraining(player3, gamestate.get_current_state(), 0.1, 0.9, 0.2, 1)
+prev_state = []
 while True:
     await event.frameadvance()
     gamestate.update_frame()
@@ -26,9 +31,11 @@ while True:
     # print(f"{player3.get_percentage()}")
     # print(f"{player3.get_position()}")
     # gamestate.get_player_info()
-    print(gamestate.get_current_state())
     
+    if gamestate.is_game_active() and prev_state != []:
+        print(tmp.train(gamestate.get_current_state(), prev_state))
     
+    prev_state = gamestate.get_current_state()
     # if gamestate.frame % 120 == 0:
     #     player3.action("grab")
     # else:

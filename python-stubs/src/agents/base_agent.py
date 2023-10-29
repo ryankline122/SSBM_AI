@@ -131,6 +131,8 @@ class BaseAgent():
         
         if val in sd_map:
             return sd_map[val]
+        else:
+            return 0
     
     def action(self, action_type):
         """
@@ -209,6 +211,8 @@ class BaseAgent():
             self.buttons["TriggerLeft"] = 1
         elif action_type == "grab":
             self.buttons["Z"] = True
+        elif action_type == "none":
+            pass
             
         controller.set_gc_buttons(self.controller_index, self.buttons)
         
