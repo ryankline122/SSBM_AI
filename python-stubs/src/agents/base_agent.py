@@ -10,7 +10,7 @@ class BaseAgent():
     """
     A class representing an agent in Super Smash Bros Melee.
     """
-    def __init__(self, player_index, gamestate):
+    def __init__(self, player_index):
         # Maps player number to string to access proper configuration
         player_index_map = {
             1: "P1",
@@ -21,7 +21,6 @@ class BaseAgent():
         self.player_index = player_index_map[player_index]
         self.controller_index = player_index - 1
         self.buttons = controller.get_gc_buttons(self.controller_index)
-        self.gamestate = gamestate
 
     def get_character(self):
         """

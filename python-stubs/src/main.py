@@ -9,9 +9,9 @@ from agents.sample_agent import SampleAgent
 from common.gamestate import GameState
 from dolphin import event, gui, memory, controller
 
-gamestate = GameState()
-player1 = BaseAgent(player_index=1, gamestate=gamestate)
-player3 = SampleAgent(player_index=3, gamestate=gamestate) # P2 points to the same memory address as P1 for some reason, so CPU will be P3
+player1 = BaseAgent(player_index=1)
+player3 = BaseAgent(player_index=3) # P2 points to the same memory address as P1 for some reason, so CPU will be P3
+gamestate = GameState(players=[player1, player3])
 while True:
     await event.frameadvance()
     gamestate.update_frame()
@@ -25,13 +25,15 @@ while True:
     # print(f"{player3.get_character()}")
     # print(f"{player3.get_percentage()}")
     # print(f"{player3.get_position()}")
+    # gamestate.get_player_info()
+    print(gamestate.is_game_active())
     
-    if gamestate.frame % 120 == 0:
-        player3.action("grab")
-    else:
-        player3.reset_buttons()
+    # if gamestate.frame % 120 == 0:
+    #     player3.action("grab")
+    # else:
+    #     player3.reset_buttons()
     
-    print(player3.buttons)
+    # print(player3.buttons)
     
     # player3.go_to(player1.get_position())
     
