@@ -22,6 +22,8 @@ class GameState():
         - Player directions
         - Player stocks
         - Player action state
+        - Opponent KOs
+        - Self destructs
         
         Terminal States:
         - Time remaining == 0.0
@@ -50,14 +52,17 @@ class GameState():
         percentage = player.get_percentage()
         stocks = player.get_stocks()
         action_state = player.get_action_state()
+        knockouts = player.get_knockouts()
+        self_destructs = player.get_self_destructs()
         
-        return [pos, direction, percentage, stocks, action_state]
-    
-    def get_game_info(self):
-        pass
+        return [pos, direction, percentage, stocks, action_state, knockouts, self_destructs]
     
     def get_current_state(self):
-        pass
+        p1_state = self.get_player_info(0)
+        p3_state = self.get_player_info(1)
+        time = self.get_time_remaining()
+        
+        return [time, p1_state, p3_state]
 
     def is_game_active(self):
         if memory.read_u32(utils.get_value_at('Global', 'game_active')) == 0:
