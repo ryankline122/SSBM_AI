@@ -21,7 +21,7 @@ class GameState():
         - Player percentages
         - Player directions
         - Player stocks
-        - Player action state -07
+        - Player action state
         
         Terminal States:
         - Time remaining == 0.0
@@ -37,7 +37,6 @@ class GameState():
         - Increase P3 KO
         - Increasing percentage
         
-        
         """
         
         self.frame = 0
@@ -50,7 +49,7 @@ class GameState():
         direction = player.get_facing_direction()
         percentage = player.get_percentage()
         stocks = player.get_stocks()
-        action_state = 0 # TODO
+        action_state = player.get_action_state()
         
         return [pos, direction, percentage, stocks, action_state]
     
@@ -71,6 +70,17 @@ class GameState():
             return False
         else:
             return True
+        
+    def is_terminal_state(self):        
+        if self.is_game_active():
+            if (int(self.get_time_remaining()) > 0 
+                and int(self.players[0].get_stocks()) > 0
+                and int(self.players[1].get_stocks()) > 0):
+                return False
+            else:
+                return True
+        else:
+            return False
     
     def get_time_remaining(self):
         """

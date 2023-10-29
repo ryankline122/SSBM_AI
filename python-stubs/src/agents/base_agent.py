@@ -116,6 +116,22 @@ class BaseAgent():
 
         return ((curr_x - opp_x), (curr_y - opp_y))
     
+    def get_knockouts(self):
+        return memory.read_u32(utils.get_value_at(self.player_index, 'knockouts'))
+
+    def get_self_destructs(self):
+        sd_map = {
+            0: 0,
+            768: 0,
+            66048: 1,
+            131328: 2,
+            196608: 3
+        }
+        val = memory.read_u32(utils.get_value_at(self.player_index, 'self_destructs'))
+        
+        if val in sd_map:
+            return sd_map[val]
+    
     def action(self, action_type):
         """
         Performs the specified action. Available actions are:

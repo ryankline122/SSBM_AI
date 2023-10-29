@@ -26,9 +26,8 @@ while True:
     # print(f"{player3.get_percentage()}")
     # print(f"{player3.get_position()}")
     # gamestate.get_player_info()
-    # print(gamestate.get_time_remaining())
+    print(player3.get_self_destructs())
     
-    print(player1.get_action_state())
     
     # if gamestate.frame % 120 == 0:
     #     player3.action("grab")
