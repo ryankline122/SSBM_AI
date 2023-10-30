@@ -141,6 +141,7 @@ class BaseAgent():
         - jump
         - left
         - right
+        - down
 
         Attack:
         ========================
@@ -169,6 +170,8 @@ class BaseAgent():
             self.buttons["StickX"] = -1
         elif action_type == "right":
             self.buttons["StickX"] = 1
+        elif action_type == "down":
+            self.buttons["StickY"] = -1
             
         # Neutral Attacks
         elif action_type == "neutral":
@@ -209,6 +212,8 @@ class BaseAgent():
             self.buttons["TriggerLeft"] = 1
         elif action_type == "grab":
             self.buttons["Z"] = True
+        elif action_type == "none":
+            pass
             
         controller.set_gc_buttons(self.controller_index, self.buttons)
         
