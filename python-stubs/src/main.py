@@ -23,12 +23,14 @@ player3.set_gamestate(gamestate)
 while True:
     await event.frameadvance()
     gamestate.update_frame()
-
-    # print("P1: ", player1.get_position())
-    # print("P3: ", player3.get_position())
+    
     
     if gamestate.is_game_active():
         player3.act()
         # player1.act()
+        print("P1: ", player1.get_position())
+        print("P3: ", player3.get_position())
+    else:
+        print("Waiting for match to start...")
     
     

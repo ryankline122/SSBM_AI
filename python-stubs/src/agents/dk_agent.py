@@ -17,6 +17,9 @@ class DKAgent(BaseAgent):
         self.gamestate = gamestate
     
     def act(self):
+        """
+        Determines what state the agent should be in given the current game state.
+        """
         if self.gamestate != None:
             # Get current state of the game to access opponent info
             current_state = self.gamestate.get_current_state()
@@ -47,6 +50,9 @@ class DKAgent(BaseAgent):
                 self.recover()
     
     def recover(self):
+        """
+        Takes actions to get itself back on stage
+        """
         curr_x, curr_y = super().get_position()
         
         if curr_x < -self.gamestate.get_stage_width():
@@ -55,12 +61,12 @@ class DKAgent(BaseAgent):
             super().action("left")
             
         if curr_y < 0:
-            self.handle_jumping(True) 
+            self.handle_jumping_for_recovery() 
             
-        
-        print("Recover!")
-        
-    def handle_jumping(self, isRecovering=False):
+    def handle_jumping_for_recovery(self):
+        """
+        Handles conflicts with double jumps and Up-"B" while in recovery state
+        """
         frames_since_last_jump = self.gamestate.frame - self.jumped_at_frame
         
         # Reset can_jump after 20 frames to allow for double jump
@@ -69,18 +75,18 @@ class DKAgent(BaseAgent):
             self.jump_count = 0
             
         if self.can_jump:
-            super().action("jump", reset_buttons=isRecovering)
+            super().action("jump")
             self.jump_count += 1
             self.can_jump = False
             self.jumped_at_frame = self.gamestate.frame
         elif frames_since_last_jump > 5 and self.can_jump == False and self.jump_count < 2:
-            super().action("jump", reset_buttons=isRecovering)
+            super().action("jump")
             self.jump_count += 1
             self.can_jump = False
             self.jumped_at_frame = self.gamestate.frame
             
-        elif self.jump_count == 2 and isRecovering:
-            super().action("up_special", reset_buttons=isRecovering)
+        elif self.jump_count == 2:
+            super().action("up_special")
             self.jump_count = 0
     
     def go_to(self, coords):
@@ -113,6 +119,7 @@ class DKAgent(BaseAgent):
             super().action("jump")
 
         # Adjust Y position
+        # TODO: Still seems to be an issue here sometimes
         if diff_y > 10:
             if super().get_buttons()["StickY"] != -1:
                 super().action("down")
