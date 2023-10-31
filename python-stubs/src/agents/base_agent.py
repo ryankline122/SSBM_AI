@@ -132,7 +132,7 @@ class BaseAgent():
         if val in sd_map:
             return sd_map[val]
     
-    def action(self, action_type):
+    def action(self, action_type, reset_buttons=True):
         """
         Performs the specified action. Available actions are:
         
@@ -145,8 +145,7 @@ class BaseAgent():
 
         Attack:
         ========================
-        - neutral
-        - special
+        - neutral_attack
         - tilt_up
         - tilt_down
         - tilt_left
@@ -156,12 +155,21 @@ class BaseAgent():
         - smash_left
         - smash_right
 
+        Specials:
+        ========================
+        - neutral_special
+        - up_special
+        - down_special
+        - left_special
+        - right_special
+
         Other:
         ========================
         - shield
         - grab
         """
-        self.reset_buttons()
+        if reset_buttons:
+            self.reset_buttons()
         
         # Movement
         if action_type == "jump":
@@ -174,9 +182,23 @@ class BaseAgent():
             self.buttons["StickY"] = -1
             
         # Neutral Attacks
-        elif action_type == "neutral":
+        elif action_type == "neutral_attack":
             self.buttons["A"] = True
-        elif action_type == "special":
+        
+        # Special Moves
+        elif action_type == "neutral_special":
+            self.buttons["B"] = True
+        elif action_type == "up_special":
+            self.buttons["StickY"] = 1
+            self.buttons["B"] = True
+        elif action_type == "down_special":
+            self.buttons["StickY"] = -1
+            self.buttons["B"] = True
+        elif action_type == "left_special":
+            self.buttons["StickX"] = -1
+            self.buttons["B"] = True
+        elif action_type == "right_special":
+            self.buttons["StickX"] = 1
             self.buttons["B"] = True
             
         # Tilt Attacks - for left and right check facing direction

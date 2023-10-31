@@ -61,6 +61,9 @@ class GameState():
         else:
             return False
     
+    def get_stage_width(self, stage="BF"):
+        return 70.0
+    
     def get_time_remaining(self):
         """
         Returns remaining time in seconds
