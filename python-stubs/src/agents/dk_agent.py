@@ -66,6 +66,7 @@ class DKAgent(BaseAgent):
         # Reset can_jump after 20 frames to allow for double jump
         if self.can_jump == False and frames_since_last_jump > 20:
             self.can_jump = True
+            self.jump_count = 0
             
         if self.can_jump:
             super().action("jump", reset_buttons=isRecovering)
