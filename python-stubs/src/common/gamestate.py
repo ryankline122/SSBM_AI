@@ -7,43 +7,8 @@ class GameState():
     A class to hold global game state 
     """
     def __init__(self, players):
-        """
-        State needed to identify a given frame:
-        
-        Game info:
-        - IsMatchRunning
-        - IsPaused
-        - Remaining time in match
-        - Current frame
-        
-        Player Info:
-        - Player positions 
-        - Player percentages
-        - Player directions
-        - Player stocks
-        - Player action state
-        - Opponent KOs
-        - Self destructs
-        
-        Terminal States:
-        - Time remaining == 0.0
-        - Agent Stocks == 0
-        - Opponent Stocks == 0
-        
-        Rewards (use negative rewards for non-terminal states):
-        - Increasing opponent percentage
-        - Increase P1 KO
-        
-        Punishments:
-        - Self Destruct
-        - Increase P3 KO
-        - Increasing percentage
-        
-        """
-        
         self.frame = 0
         self.players = players
-        self.Q = defaultdict(dict)
         
     def get_player_info(self, player_index):
         player = self.players[player_index]
@@ -55,7 +20,16 @@ class GameState():
         knockouts = player.get_knockouts()
         self_destructs = player.get_self_destructs()
         
-        return [pos, direction, percentage, stocks, action_state, knockouts, self_destructs]
+        return {
+            'Player': player,
+            'Position': pos,
+            'Direction': direction,
+            'Percentage': percentage,
+            'Stocks': stocks,
+            'Action State': action_state,
+            'Knockouts': knockouts,
+            'Self Destructs': self_destructs
+        }
     
     def get_current_state(self):
         p1_state = self.get_player_info(0)
