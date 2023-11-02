@@ -1,5 +1,6 @@
 from .base_agent import BaseAgent
 from dolphin import controller, event
+import random
 
 class DKAgent(BaseAgent):
     """
@@ -42,12 +43,59 @@ class DKAgent(BaseAgent):
             
             stage_width = self.gamestate.get_stage_width()
             
+            diff_x, diff_y = super().get_distance_to_opponent(opponent_pos)
+            attack_direction = "left" if diff_x > 0 else "right"
+            
+            # Make sure agent is facing opponent
+            if diff_x > 0 and agent_direction == "right":
+                super().action("left")
+            elif diff_x < 0 and agent_direction == "left":
+                super().action("right")
+            
+            # Determines what state the agent should be in based on its location on the stage
             if (-stage_width < agent_pos[0] < stage_width):
-                if (-stage_width < opponent_pos[0] < stage_width) and opponent_pos[1] >= 0:
-                    # If opponent is on the stage, go after them
-                    self.go_to(opponent_pos)
+                if opponent_pos[1] >= 0:
+                    if abs(diff_x) < 25 and abs(diff_y) < 10:
+                        self.attack(attack_direction)
+                    
+                    else:
+                        self.go_to(opponent_pos)
             else:
                 self.recover()
+                
+    def attack(self, direction, smash=False):
+        print("Attack")
+        
+        attacks = {
+            "neutral_attack": 1,
+            "special_left": 2,
+            "special_right": 2,
+            "tilt_up": 4,
+            "tilt_down": 4,
+            "tilt_left": 4,
+            "tilt_right": 4,
+            "smash_up": 0,
+            "smash_down": 2,
+            "smash_left": 2,
+            "smash_right": 2,
+            "grab": 3,
+            "block": 4,
+        }
+
+        if direction == "left":
+            attacks["special_right"] = 0
+            attacks["tilt_right"] = 0
+            attacks["smash_right"] = 0
+        elif direction == "right":
+            attacks["special_left"] = 0
+            attacks["tilt_left"] = 0
+            attacks["smash_left"] = 0
+        
+        actions = list(attacks.keys())
+        weights = list(attacks.values())
+        choice = random.choices(actions, weights=weights, k=1)[0]
+        
+        super().action(choice)
     
     def recover(self):
         """
@@ -95,6 +143,7 @@ class DKAgent(BaseAgent):
         and performs actions to close the distance such that the agent is within (+/-target_x, 0)
         with respect to the goal.
         """
+        print("Go to")
         diff_x, diff_y = super().get_distance_to_opponent(coords)
         frames_since_last_jump = self.gamestate.frame - self.jumped_at_frame
 
@@ -125,4 +174,5 @@ class DKAgent(BaseAgent):
                 super().action("down")
             else:
                 # Prevents it from getting stuck if unable to drop from platform initially
+                super().set_buttons("StickY", 0.0)
                 super().action("none")
