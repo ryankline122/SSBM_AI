@@ -1,6 +1,7 @@
 from .base_agent import BaseAgent
 from dolphin import controller, event
 import random
+import itertools
 
 class DKAgent(BaseAgent):
     """
@@ -11,6 +12,8 @@ class DKAgent(BaseAgent):
         self.jumped_at_frame = 0
         self.can_jump = True
         self.jump_count = 0
+        self.down_active = 0
+        self.down_frame = 0
         self.gamestate = None
         self.get_distance_to_opponent = (0,0)
     
@@ -53,8 +56,8 @@ class DKAgent(BaseAgent):
                 super().action("right")
             
             # Determines what state the agent should be in based on its location on the stage
-            if (-stage_width < agent_pos[0] < stage_width):
-                if opponent_pos[1] >= 0:
+            if (-stage_width < agent_pos[0] < stage_width) and agent_pos[1] >= 0:
+                if (-stage_width < opponent_pos[0] < stage_width) and opponent_pos[1] >= 0:
                     if abs(diff_x) < 25 and abs(diff_y) < 10:
                         self.attack(attack_direction)
                     
@@ -65,37 +68,56 @@ class DKAgent(BaseAgent):
                 
     def attack(self, direction, smash=False):
         print("Attack")
+        opponent_state = self.gamestate.get_current_state()[1] if self.player_index == 'P3' else current_state[2]
+        opponent_pos = opponent_state["Position"]
+        opponent_percentage = opponent_state["Percentage"]
+        
+        diff_x, diff_y = super().get_distance_to_opponent(opponent_pos)
         
         attacks = {
-            "neutral_attack": 1,
-            "special_left": 2,
-            "special_right": 2,
-            "tilt_up": 4,
-            "tilt_down": 4,
-            "tilt_left": 4,
-            "tilt_right": 4,
-            "smash_up": 0,
-            "smash_down": 2,
-            "smash_left": 2,
-            "smash_right": 2,
-            "grab": 3,
-            "block": 4,
+            "neutral_attack": 0.1,
+            "special_left": 0.2,
+            "special_right": 0.2,
+            "tilt_up": 0.4,
+            "tilt_down": 0.4,
+            "tilt_left": 0.4,
+            "tilt_right": 0.4,
+            "smash_up": 0.0,
+            "smash_down": 0.2,
+            "smash_left": 0.2,
+            "smash_right": 0.2,
+            "grab": 0.3,
+            "block": 0.6,
         }
-
-        if direction == "left":
-            attacks["special_right"] = 0
-            attacks["tilt_right"] = 0
-            attacks["smash_right"] = 0
-        elif direction == "right":
-            attacks["special_left"] = 0
-            attacks["tilt_left"] = 0
-            attacks["smash_left"] = 0
         
-        actions = list(attacks.keys())
-        weights = list(attacks.values())
-        choice = random.choices(actions, weights=weights, k=1)[0]
+        weights = self.prepare_weights(attacks, direction, diff_y)
+        choice = self.weighted_random(weights)
         
         super().action(choice)
+        
+    def prepare_weights(self, attacks, direction, diff_y):
+        weights = attacks.copy()
+        if direction == "left":
+            weights["special_right"] = 0
+            weights["tilt_right"] = 0
+            weights["smash_right"] = 0
+        elif direction == "right":
+            weights["special_left"] = 0
+            weights["tilt_left"] = 0
+            weights["smash_left"] = 0
+        if diff_y < 0:
+            weights['tilt_up'] = 0.6
+            weights['smash_up'] = 0.4
+        elif diff_y > 0:
+            weights['tilt_down'] = 0.5
+        return weights
+
+    def weighted_random(self, weights):
+        running_totals = list(itertools.accumulate(weights.values()))
+        target_distance = random.random() * running_totals[-1]
+        for i, weight in enumerate(running_totals):
+            if weight >= target_distance:
+                return list(weights.keys())[i]
     
     def recover(self):
         """
@@ -127,7 +149,7 @@ class DKAgent(BaseAgent):
             self.jump_count += 1
             self.can_jump = False
             self.jumped_at_frame = self.gamestate.frame
-        elif frames_since_last_jump > 5 and self.can_jump == False and self.jump_count < 2:
+        elif frames_since_last_jump > 4 and self.can_jump == False and self.jump_count < 2:
             super().action("jump")
             self.jump_count += 1
             self.can_jump = False
@@ -169,10 +191,12 @@ class DKAgent(BaseAgent):
 
         # Adjust Y position
         # TODO: Still seems to be an issue here sometimes
+        frames_since_first_down = self.gamestate.frame - self.down_frame
         if diff_y > 10:
             if super().get_buttons()["StickY"] != -1:
+                # self.down_frame = self.gamestate.frame
+                # self.down_active = True
                 super().action("down")
             else:
                 # Prevents it from getting stuck if unable to drop from platform initially
-                super().set_buttons("StickY", 0.0)
                 super().action("none")
