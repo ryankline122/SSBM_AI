@@ -10,7 +10,10 @@ class DKAgent(BaseAgent):
     def __init__(self, player_index):
         super().__init__(player_index)
         self.jumped_at_frame = 0
+        self.attacked_at_frame = 0
         self.can_jump = True
+        self.blocking = False
+        self.block_start_frame = 0
         self.jump_count = 0
         self.down_active = 0
         self.down_frame = 0
@@ -25,8 +28,9 @@ class DKAgent(BaseAgent):
         Determines what state the agent should be in given the current game state.
         """
         if self.gamestate != None:
-            # Get current state of the game to access opponent info
+            # TODO: get previous gamestate, findout when agent is knocked down
             current_state = self.gamestate.get_current_state()
+            frame_since_last_attack = self.gamestate.frame - self.attacked_at_frame
 
             agent_state = current_state[1] if self.player_index == 'P1' else current_state[2]
             agent_pos = agent_state["Position"]
@@ -46,28 +50,42 @@ class DKAgent(BaseAgent):
             
             stage_width = self.gamestate.get_stage_width()
             
+            print(agent_action_state)
             diff_x, diff_y = super().get_distance_to_opponent(opponent_pos)
             attack_direction = "left" if diff_x > 0 else "right"
             
+            # Roll away from opponent
+            if (agent_action_state == 184 or
+                agent_action_state == 183 or
+                agent_action_state == 192 or
+                agent_action_state == 196 or
+                agent_action_state == 197):
+                get_up_direction = "left" if diff_x < 0 else "right"
+                super().action(get_up_direction)
+                print(get_up_direction)
+                return
+
             # Make sure agent is facing opponent
             if diff_x > 0 and agent_direction == "right":
                 super().action("left")
+                return
             elif diff_x < 0 and agent_direction == "left":
                 super().action("right")
+                return
             
             # Determines what state the agent should be in based on its location on the stage
-            if (-stage_width < agent_pos[0] < stage_width) and agent_pos[1] >= 0:
-                if (-stage_width < opponent_pos[0] < stage_width) and opponent_pos[1] >= 0:
+            if (-stage_width < agent_pos[0] < stage_width and agent_pos[1] >= 0):
+                if ((-stage_width < opponent_pos[0] < stage_width) and opponent_pos[1] >= 0):
                     if abs(diff_x) < 25 and abs(diff_y) < 10:
-                        self.attack(attack_direction)
-                    
+                        # Do something when holding opponent
+                        isHolding = True if agent_action_state == 216 else False
+                        self.attack(attack_direction, holding=isHolding)
                     else:
                         self.go_to(opponent_pos)
             else:
                 self.recover()
                 
-    def attack(self, direction, smash=False):
-        print("Attack")
+    def attack(self, direction, smash=False, holding=False):
         opponent_state = self.gamestate.get_current_state()[1] if self.player_index == 'P3' else current_state[2]
         opponent_pos = opponent_state["Position"]
         opponent_percentage = opponent_state["Percentage"]
@@ -76,26 +94,26 @@ class DKAgent(BaseAgent):
         
         attacks = {
             "neutral_attack": 0.1,
-            "special_left": 0.2,
-            "special_right": 0.2,
-            "tilt_up": 0.4,
-            "tilt_down": 0.4,
-            "tilt_left": 0.4,
-            "tilt_right": 0.4,
+            "special_left": 0.4,
+            "special_right": 0.4,
+            "tilt_up": 0.2,
+            "tilt_down": 0.5,
+            "tilt_left": 0.5,
+            "tilt_right": 0.5,
             "smash_up": 0.0,
             "smash_down": 0.2,
             "smash_left": 0.2,
             "smash_right": 0.2,
             "grab": 0.3,
-            "block": 0.6,
+            "block": 0.4,
         }
         
-        weights = self.prepare_weights(attacks, direction, diff_y)
+        weights = self.prepare_weights(attacks, direction, diff_y, holding)
         choice = self.weighted_random(weights)
         
         super().action(choice)
         
-    def prepare_weights(self, attacks, direction, diff_y):
+    def prepare_weights(self, attacks, direction, diff_y, holding):
         weights = attacks.copy()
         if direction == "left":
             weights["special_right"] = 0
@@ -105,11 +123,18 @@ class DKAgent(BaseAgent):
             weights["special_left"] = 0
             weights["tilt_left"] = 0
             weights["smash_left"] = 0
+            
         if diff_y < 0:
-            weights['tilt_up'] = 0.6
-            weights['smash_up'] = 0.4
+            weights['tilt_down'] = 0.0
+            weights['smash_down'] = 0.0
         elif diff_y > 0:
-            weights['tilt_down'] = 0.5
+            weights['smash_up'] = 0.0
+            weights['tilt_up'] = 0.0
+            
+        if holding:
+            weights['grab'] = 0
+            weights['block'] = 0
+        
         return weights
 
     def weighted_random(self, weights):
@@ -149,15 +174,18 @@ class DKAgent(BaseAgent):
             self.jump_count += 1
             self.can_jump = False
             self.jumped_at_frame = self.gamestate.frame
+            return
         elif frames_since_last_jump > 4 and self.can_jump == False and self.jump_count < 2:
             super().action("jump")
             self.jump_count += 1
             self.can_jump = False
             self.jumped_at_frame = self.gamestate.frame
+            return
             
         elif self.jump_count == 2:
             super().action("up_special")
             self.jump_count = 0
+            return
     
     def go_to(self, coords):
         """
@@ -165,7 +193,6 @@ class DKAgent(BaseAgent):
         and performs actions to close the distance such that the agent is within (+/-target_x, 0)
         with respect to the goal.
         """
-        print("Go to")
         diff_x, diff_y = super().get_distance_to_opponent(coords)
         frames_since_last_jump = self.gamestate.frame - self.jumped_at_frame
 
@@ -199,4 +226,4 @@ class DKAgent(BaseAgent):
                 super().action("down")
             else:
                 # Prevents it from getting stuck if unable to drop from platform initially
-                super().action("none")
+                super().action("jump")

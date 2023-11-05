@@ -168,7 +168,7 @@ class BaseAgent():
         - shield
         - grab
         """
-        if reset_buttons:
+        if reset_buttons and action_type != "block":
             self.reset_buttons()
         
         # Movement
@@ -230,7 +230,7 @@ class BaseAgent():
             self.buttons["A"] = True
 
         # Other
-        elif action_type == "shield":
+        elif action_type == "block":
             self.buttons["TriggerLeft"] = 1
         elif action_type == "grab":
             self.buttons["Z"] = True
