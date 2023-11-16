@@ -23,10 +23,14 @@ player3.set_gamestate(gamestate)
 while True:
     await event.frameadvance()
     gamestate.update_frame()
+    print("Current: ", gamestate.get_current_state())
+    print("Previous: ", gamestate.get_prev_state())
     
     
     if gamestate.is_game_active():
         player3.act()
+
+        gamestate.set_prev_state(gamestate.get_current_state())
         # player1.act()
         # print("P1: ", player1.get_position())
         # print("P3: ", player3.get_position())

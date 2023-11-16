@@ -9,6 +9,7 @@ class GameState():
     def __init__(self, players):
         self.frame = 0
         self.players = players
+        self.prev_state = []
         
     def get_player_info(self, player_index):
         player = self.players[player_index]
@@ -30,6 +31,12 @@ class GameState():
             'Knockouts': knockouts,
             'Self Destructs': self_destructs
         }
+    
+    def get_prev_state(self):
+        return self.prev_state
+    
+    def set_prev_state(self, state):
+        self.prev_state = state
     
     def get_current_state(self):
         p1_state = self.get_player_info(0)
