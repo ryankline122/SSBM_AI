@@ -59,18 +59,15 @@ class DKAgent(BaseAgent):
                 get_up_direction = "left" if diff_x < 0 else "right"
                 super().action(get_up_direction)
                 print(get_up_direction)
-                return
 
             # Make sure agent is facing opponent
             if diff_x > 0 and curr_agent_direction == "right":
                 super().action("left")
-                return
             elif diff_x < 0 and curr_agent_direction == "left":
                 super().action("right")
-                return
             
             # Determines what state the agent should be in based on its location on the stage
-            if (-stage_width < curr_agent_pos[0] < stage_width):
+            if (-stage_width < curr_agent_pos[0] < stage_width ):
                 # Sometimes can pull of edge guards without this, but can be risky so only attempt off-stage attacks if ahead
                 if ((-stage_width < curr_opponent_pos[0] < stage_width) and curr_opponent_pos[1] >= 0):
                     if abs(diff_x) < 27 and abs(diff_y) < 20:
@@ -83,6 +80,7 @@ class DKAgent(BaseAgent):
                 self.recover()
                 
     def attack(self, direction, smash=False, holding=False):
+        print("Attack")
         opponent_state = self.gamestate.get_current_state()[1] if self.player_index == 'P3' else current_state[2]
         opponent_pos = opponent_state["Position"]
         opponent_percentage = opponent_state["Percentage"]
@@ -192,6 +190,7 @@ class DKAgent(BaseAgent):
         """
         Takes actions to get itself back on stage
         """
+        print("Recover")
         curr_x, curr_y = super().get_position()
         
         if curr_x < -self.gamestate.get_stage_width():
@@ -237,6 +236,7 @@ class DKAgent(BaseAgent):
         and performs actions to close the distance such that the agent is within (+/-target_x, 0)
         with respect to the goal.
         """
+        print("go to")
         diff_x, diff_y = super().get_distance_to_opponent(coords)
         frames_since_last_jump = self.gamestate.frame - self.jumped_at_frame
 
@@ -244,7 +244,7 @@ class DKAgent(BaseAgent):
             self.can_jump = True
         
         # Keeps agent from getting stuck when opponent is on end of platform
-        target_x = 10 if diff_y >= 0 else 5
+        target_x = 10
 
         # Adjust X position
         if diff_x < -target_x:

@@ -69,7 +69,7 @@ class GameState():
             return False
     
     def get_stage_width(self, stage="BF"):
-        return 68.0
+        return 66.0
     
     def get_time_remaining(self):
         """
