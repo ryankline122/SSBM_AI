@@ -268,4 +268,4 @@ class DKAgent(BaseAgent):
                 super().action("down")
             else:
                 # Prevents it from getting stuck if unable to drop from platform initially
-                super().action("left")
+                super().action("none")
