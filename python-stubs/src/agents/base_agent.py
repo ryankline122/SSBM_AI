@@ -95,7 +95,10 @@ class BaseAgent():
             y_pos = 0.0
         
         return (x_pos, y_pos)
-    
+
+    def get_grounded(self):
+        return memory.read_u32(utils.get_value_at(self.player_index, 'isGrounded'))
+
     def get_percentage(self):
         """
         Returns the current percentage of the agent as a float.
@@ -167,8 +170,21 @@ class BaseAgent():
            self.buttons["X"] = True 
         elif action_type == "left":
             self.buttons["StickX"] = -1
+            self.buttons["B"] = False
         elif action_type == "right":
             self.buttons["StickX"] = 1
+            self.buttons["B"] = False
+        elif action_type == "down":
+            self.buttons["StickY"] = -1
+        elif action_type == "up_right":
+            self.buttons["StickX"] = 1
+            self.buttons["StickY"] = 1
+            self.buttons["B"] = False
+        elif action_type == "up_left":
+            self.buttons["StickX"] = -1
+            self.buttons["StickY"] = 1
+            self.buttons["B"] = False
+
             
         # Neutral Attacks
         elif action_type == "neutral":
@@ -203,6 +219,28 @@ class BaseAgent():
         elif action_type == "smash_down":
             self.buttons["StickY"] = -1
             self.buttons["A"] = True
+
+        # B Attacks
+        elif action_type == "b_left":
+            self.buttons["StickX"] = -1
+            self.buttons["B"] = True
+        elif action_type == "b_right":
+            self.buttons["StickX"] = 1
+            self.buttons["B"] = True
+        elif action_type == "b_up":
+            self.buttons["StickY"] = 1
+            self.buttons["B"] = True
+        # elif action_type == "b_up_left":
+        #     self.buttons["StickY"] = 1
+        #     self.buttons["StickX"] = -1
+        #     self.buttons["B"] = True
+        # elif action_type == "b_up_right":
+        #     self.buttons["StickY"] = 1
+        #     self.buttons["StickX"] = 1
+        #     self.buttons["B"] = True
+        elif action_type == "b_down":
+            self.buttons["StickY"] = -1
+            self.buttons["B"] = True
 
         # Other
         elif action_type == "shield":

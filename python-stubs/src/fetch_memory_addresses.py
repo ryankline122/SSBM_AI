@@ -13,7 +13,7 @@ def update_config(player_name, player_base_address):
     """
     # Create a ConfigParser object and read the config.ini file
     config = configparser.ConfigParser()
-    config.read('python-stubs\src\config.ini')
+    config.read('C:\\Users\matth\PycharmProjects\AI_Final_Project\dolphin-scripting-preview3-x64\SSBM_AI\python-stubs\src\config.ini')
     
     # Retrieve the new values from the get_player_addresses function
     player_addresses = get_player_addresses(player_base_address)
@@ -29,7 +29,7 @@ def update_config(player_name, player_base_address):
     config.set(player_name, 'action_state', player_addresses['action_state_addr'])
 
     # Write the changes back to the config.ini file
-    with open('python-stubs\src\config.ini', 'w') as configfile:
+    with open('C:\\Users\matth\PycharmProjects\AI_Final_Project\dolphin-scripting-preview3-x64\SSBM_AI\python-stubs\src\config.ini', 'w') as configfile:
         config.write(configfile)
 
 
@@ -72,7 +72,7 @@ def setup():
 
 if __name__ == "__main__":
     """
-    Hooks into Dolpin, then updates the config file with the identified addresses for each
+    Hooks into Dolphin, then updates the config file with the identified addresses for each
     player.
     """
     setup()

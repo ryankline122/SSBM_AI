@@ -4,7 +4,7 @@ Module containing helper functions for SSBM
 import configparser
 
 config = configparser.ConfigParser()
-config.read('SSBM_AI\python-stubs\src\config.ini')
+config.read('C:\\Users\matth\PycharmProjects\AI_Final_Project\dolphin-scripting-preview3-x64\SSBM_AI\python-stubs\src\config.ini')
 
 def get_value_at(config_section, config_field):
     """
