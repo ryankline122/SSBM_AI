@@ -10,15 +10,10 @@ class DKAgent(BaseAgent):
     def __init__(self, player_index):
         super().__init__(player_index)
         self.jumped_at_frame = 0
-        self.attacked_at_frame = 0
         self.can_jump = True
-        self.blocking = False
-        self.block_start_frame = 0
         self.jump_count = 0
         self.down_active = 0
-        self.down_frame = 0
         self.gamestate = None
-        self.get_distance_to_opponent = (0,0)
     
     def set_gamestate(self, gamestate):
         self.gamestate = gamestate
@@ -58,7 +53,6 @@ class DKAgent(BaseAgent):
                 curr_agent_action_state == 197):
                 get_up_direction = "left" if diff_x < 0 else "right"
                 super().action(get_up_direction)
-                print(get_up_direction)
 
             # Make sure agent is facing opponent
             if diff_x > 0 and curr_agent_direction == "right":
@@ -68,10 +62,9 @@ class DKAgent(BaseAgent):
             
             # Determines what state the agent should be in based on its location on the stage
             if (-stage_width < curr_agent_pos[0] < stage_width ):
-                # Sometimes can pull of edge guards without this, but can be risky so only attempt off-stage attacks if ahead
                 if ((-stage_width < curr_opponent_pos[0] < stage_width) and curr_opponent_pos[1] >= 0):
                     if abs(diff_x) < 27 and abs(diff_y) < 20:
-                        # Do something when holding opponent
+                        # Makes sure to do something when holding opponent
                         isHolding = True if curr_agent_action_state == 216 else False
                         self.attack(attack_direction, holding=isHolding)
                     else:
@@ -80,7 +73,9 @@ class DKAgent(BaseAgent):
                 self.recover()
                 
     def attack(self, direction, smash=False, holding=False):
-        print("Attack")
+        """
+        Chooses a weighted random attack based on the current state of the players.
+        """
         current_state = self.gamestate.get_current_state()
         opponent_state = current_state()[1] if self.player_index == 'P3' else current_state()[2]
         opponent_pos = opponent_state["Position"]
@@ -110,23 +105,19 @@ class DKAgent(BaseAgent):
         super().action(choice)
         
     def prepare_weights(self, attacks, direction, diff_y, holding):
+        """
+        Adjusts the attack weights as needed before making a selection.
+        """
         weights = attacks.copy()
+
         current_state = self.gamestate.get_current_state()
         prev_state = self.gamestate.get_prev_state()
 
-        # Current State of players
         curr_agent_state = current_state[1] if self.player_index == 'P1' else current_state[2]
-        curr_agent_pos = curr_agent_state["Position"]
-        curr_agent_direction = curr_agent_state["Direction"]
         curr_agent_percentage = curr_agent_state["Percentage"]
-        curr_agent_stocks = curr_agent_state["Stocks"]
-        curr_agent_action_state = curr_agent_state["Action State"]
 
         curr_opponent_state = current_state[1] if self.player_index == 'P3' else current_state[2]
-        curr_opponent_pos = curr_opponent_state["Position"]
-        curr_opponent_direction = curr_opponent_state["Direction"]
         curr_opponent_percentage = curr_opponent_state["Percentage"]
-        curr_opponent_stocks = curr_opponent_state["Stocks"]
 
         if direction == "left":
             weights["special_right"] = 0
@@ -163,17 +154,10 @@ class DKAgent(BaseAgent):
             
         if prev_state != []:
             prev_agent_state = prev_state[1] if self.player_index == 'P1' else current_state[2]
-            prev_agent_pos = prev_agent_state["Position"]
-            prev_agent_direction = prev_agent_state["Direction"]
             prev_agent_percentage = prev_agent_state["Percentage"]
-            prev_agent_stocks = prev_agent_state["Stocks"]
-            prev_agent_action_state = prev_agent_state["Action State"]
 
             prev_opponent_state = prev_state[1] if self.player_index == 'P3' else current_state[2]
-            prev_opponent_pos = prev_opponent_state["Position"]
-            prev_opponent_direction = prev_opponent_state["Direction"]
             prev_opponent_percentage = prev_opponent_state["Percentage"]
-            prev_opponent_stocks = prev_opponent_state["Stocks"]
             
             if curr_agent_percentage > prev_agent_percentage:
                 weights['block'] = 0.6
@@ -181,6 +165,9 @@ class DKAgent(BaseAgent):
         return weights
 
     def weighted_random(self, weights):
+        """
+        Makes a random choice from a list of weighted attacks.
+        """
         running_totals = list(itertools.accumulate(weights.values()))
         target_distance = random.random() * running_totals[-1]
         for i, weight in enumerate(running_totals):
@@ -191,7 +178,6 @@ class DKAgent(BaseAgent):
         """
         Takes actions to get itself back on stage
         """
-        print("Recover")
         curr_x, curr_y = super().get_position()
         
         if curr_x < -self.gamestate.get_stage_width():
@@ -237,14 +223,12 @@ class DKAgent(BaseAgent):
         and performs actions to close the distance such that the agent is within (+/-target_x, 0)
         with respect to the goal.
         """
-        print("go to")
         diff_x, diff_y = super().get_distance_to_opponent(coords)
         frames_since_last_jump = self.gamestate.frame - self.jumped_at_frame
 
         if not self.can_jump and frames_since_last_jump > 20:
             self.can_jump = True
         
-        # Keeps agent from getting stuck when opponent is on end of platform
         target_x = 10
 
         # Adjust X position
@@ -264,10 +248,9 @@ class DKAgent(BaseAgent):
         # Adjust Y position
         frames_since_first_down = self.gamestate.frame - self.down_frame
         if diff_y > 10:
-            if super().get_buttons()["StickY"] != -1 and frames_since_first_down > 3:
+            # Prevents it from getting stuck if unable to drop from platform initially
+            if frames_since_first_down > 3:
                 self.down_frame = self.gamestate.frame
-                self.down_active = True
                 super().action("down")
             else:
-                # Prevents it from getting stuck if unable to drop from platform initially
                 super().action("none")
