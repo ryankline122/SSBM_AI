@@ -13,6 +13,7 @@ class DKAgent(BaseAgent):
         self.can_jump = True
         self.jump_count = 0
         self.down_active = 0
+        self.down_frame = 0
         self.gamestate = None
     
     def set_gamestate(self, gamestate):
@@ -77,7 +78,7 @@ class DKAgent(BaseAgent):
         Chooses a weighted random attack based on the current state of the players.
         """
         current_state = self.gamestate.get_current_state()
-        opponent_state = current_state()[1] if self.player_index == 'P3' else current_state()[2]
+        opponent_state = current_state[1] if self.player_index == 'P3' else current_state[2]
         opponent_pos = opponent_state["Position"]
         opponent_percentage = opponent_state["Percentage"]
         

@@ -55,7 +55,7 @@ class PikachuAgent(BaseAgent):
 
         #print("self.usedUPB: " + str(self.usedUPB))
 
-        if( (y < -2 or (x < -70 and x > -75) or (x > 70 and x < 75)) and not self.usedUPB ):
+        if( (y < -5 or (x < -70 and x > -75) or (x > 70 and x < 75)) and not self.usedUPB ):
             super().action("up_special")
             self.usedUPB = True
             #print("b_up")
@@ -95,30 +95,41 @@ class PikachuAgent(BaseAgent):
 
     def main(self, player1):
 
-        if self.gamestate.frame % 20 != 0:
+        diff_x, diff_y = self.get_distance_to_opponent(player1.get_position())
+
+        if self.gamestate.frame % 8 != 0:
             x, y = self.get_position()
             x2, y2 = player1.get_position()
             if (x < 68.4 and x > -68.4) and self.usedUPB:
                 self.usedUPB = False
             if (y > 25 and x < 65 and x > -65 and y2 < y):
-                self.action("down")
-                print("fall")
+                if((diff_x < 10 and diff_x > -10) and y > 50):
+                    list = [1, 2, 3]
+                    choice = random.choice(list)
+                    if choice == 1:
+                        self.action("left_special")
+                    if choice == 2:
+                        self.action("down_special")
+                    else:
+                        self.action("right_special")
+                else:
+                    self.action("down")
+                #print("fall")
             if (y < -2 or x > 68.4 or x < -68.4):
                 self.recover()
-                print("recover")
+                #print("recover")
             else:
-                diff_x, diff_y = self.get_distance_to_opponent(player1.get_position())
                 if (x < 70 and x > 65):
                     self.action("left_special")
-                    print("edge left")
+                    #print("edge left")
                 elif (x > -70 and x < -65):
                     self.action("right_special")
-                    print("edge right")
-                elif ((diff_x < 10 and diff_x > -10) and (diff_y < 10 and diff_y > -10) and self.gamestate.frame % 10 != 0):
+                    #print("edge right")
+                elif ((diff_x < 13 and diff_x > -13) and (diff_y < 13 and diff_y > -13) and self.gamestate.frame % 4 != 0):
                     list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
                     choice = random.choice(list)
-                    print("attack")
-                    if (player1.get_percentage() > 100):
+                    #print("attack")
+                    if (player1.get_percentage() > 70):
                         if (choice <= 6):
                             self.action("smash_up")
                         elif (choice <= 14):
@@ -132,17 +143,21 @@ class PikachuAgent(BaseAgent):
                             self.action("grab")
                 elif (x < 65 and x > -65):
                     if (y > 0 and (y2) > y + 20 and (diff_x < 10 and diff_x > -10) and (
-                            (x > -40 and x < 40) or y > 40)):
+                            (x > -40 and x < 40) or y > 60)):
                         self.action("down_special")
-                        print("thunder")
-                    elif (y2 < y + 5) and x2 > x + 25:
+                        #print("thunder")
+                    if diff_x > 0 and self.get_facing_direction() == "right":
+                        super().action("left")
+                    elif diff_x < 0 and self.get_facing_direction() == "left":
+                        super().action("right")
+                    elif (y2 < y + 5) and x2 > x + 40:
                         self.action("neutral_special")
-                        print("special")
+                        #print("special")
                     else:
                         self.go_to(player1.get_position())
-                        print("goto")
+                        #print("goto")
                 else:
                     self.reset_buttons()
-                    print("none")
+                    #print("none")
         else:
             self.reset_buttons()
