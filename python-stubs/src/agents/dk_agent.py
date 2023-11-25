@@ -70,10 +70,10 @@ class DKAgent(BaseAgent):
                 return
             
             # Determines what state the agent should be in based on its location on the stage
-            if (-stage_width < curr_agent_pos[0] < stage_width and curr_agent_pos[1] >= 0):
+            if (-stage_width < curr_agent_pos[0] < stage_width):
                 # Sometimes can pull of edge guards without this, but can be risky so only attempt off-stage attacks if ahead
                 if ((-stage_width < curr_opponent_pos[0] < stage_width) and curr_opponent_pos[1] >= 0):
-                    if abs(diff_x) < 27 and abs(diff_y) < 10:
+                    if abs(diff_x) < 27 and abs(diff_y) < 20:
                         # Do something when holding opponent
                         isHolding = True if curr_agent_action_state == 216 else False
                         self.attack(attack_direction, holding=isHolding)
@@ -148,6 +148,7 @@ class DKAgent(BaseAgent):
         if diff_y < 0:
             weights['tilt_down'] = 0.0
             weights['smash_down'] = 0.0
+            weights['tilt_up'] = 6.0
             if curr_opponent_percentage > 80 and super().get_buttons()['StickY'] != 1:
                 weights['smash_up'] = 0.8
         elif diff_y > 0:
@@ -268,4 +269,4 @@ class DKAgent(BaseAgent):
                 super().action("down")
             else:
                 # Prevents it from getting stuck if unable to drop from platform initially
-                super().action("left")
+                super().action("none")
