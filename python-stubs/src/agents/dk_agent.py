@@ -81,7 +81,8 @@ class DKAgent(BaseAgent):
                 
     def attack(self, direction, smash=False, holding=False):
         print("Attack")
-        opponent_state = self.gamestate.get_current_state()[1] if self.player_index == 'P3' else current_state[2]
+        current_state = self.gamestate.get_current_state()
+        opponent_state = current_state()[1] if self.player_index == 'P3' else current_state()[2]
         opponent_pos = opponent_state["Position"]
         opponent_percentage = opponent_state["Percentage"]
         

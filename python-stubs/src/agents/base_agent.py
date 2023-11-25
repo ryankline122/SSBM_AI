@@ -183,11 +183,9 @@ class BaseAgent():
         elif action_type == "up_right":
             self.buttons["StickX"] = 1
             self.buttons["StickY"] = 1
-            self.buttons["B"] = False
         elif action_type == "up_left":
             self.buttons["StickX"] = -1
             self.buttons["StickY"] = 1
-            self.buttons["B"] = False
             
         # Neutral Attacks
         elif action_type == "neutral_attack":

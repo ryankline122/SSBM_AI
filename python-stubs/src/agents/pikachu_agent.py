@@ -4,7 +4,6 @@ import random
 
 
 class PikachuAgent(BaseAgent):
-
     """
     A Sample Agent class to help get you started creating your own agents.
     """
@@ -13,6 +12,7 @@ class PikachuAgent(BaseAgent):
         self.jumped_at_frame = 0
         self.jumped = False
         self.gamestate = None
+        self.usedUPB = False
 
     def set_gamestate(self, gamestate):
         self.gamestate = gamestate
@@ -46,67 +46,65 @@ class PikachuAgent(BaseAgent):
         elif diff_y < -5 and frames_since_last_jump > 5 and self.jumped:
             super().action("jump")
 
-    def recover(self, usedUPB):
+    def recover(self):
         """
         Performs actions to recover.
         """
         x, y = super().get_position()
         #print(x)
 
-        #print("usedUPB: " + str(usedUPB))
+        #print("self.usedUPB: " + str(self.usedUPB))
 
-        if( (y < -2 or (x < -70 and x > -75) or (x > 70 and x < 75)) and not usedUPB ):
+        if( (y < -2 or (x < -70 and x > -75) or (x > 70 and x < 75)) and not self.usedUPB ):
             super().action("up_special")
-            usedUPB = True
+            self.usedUPB = True
             #print("b_up")
         elif( x > 68.4 and x < 75):
-            if (not usedUPB):
+            if (not self.usedUPB):
                 super().action("up_special")
-                usedUPB = True
+                self.usedUPB = True
             else:
                 super().action("left")
         elif(x > 75):
-            if (not usedUPB):
+            if (not self.usedUPB):
                 super().action("left_special")
                 #print("b_left")
             else:
                 super().action("up_left")
                 #print("up_left")
                 #print("RESET: " + str(x))
-                usedUPB = False
+                self.usedUPB = False
         elif( x < -68.4 and x > -75):
-            if (not usedUPB):
+            if (not self.usedUPB):
                 super().action("up_special")
-                usedUPB = True
+                self.usedUPB = True
             else:
                 super().action("right")
         elif (x < -75):
-            if (not usedUPB):
+            if (not self.usedUPB):
                 super().action("right_special")
                 #print("b_right")
             else:
                 super().action("up_right")
                 #print("up_right")
                 #print("RESET: " + str(x))
-                usedUPB = False
+                self.usedUPB = False
         else:
             super().reset_buttons()
             #print("none")
 
-        return usedUPB
-
-    def main(self, player1, usedUPB):
+    def main(self, player1):
 
         if self.gamestate.frame % 20 != 0:
             x, y = self.get_position()
             x2, y2 = player1.get_position()
-            if (x < 68.4 and x > -68.4) and usedUPB:
-                usedUPB = False
+            if (x < 68.4 and x > -68.4) and self.usedUPB:
+                self.usedUPB = False
             if (y > 25 and x < 65 and x > -65 and y2 < y):
                 self.action("down")
                 print("fall")
             if (y < -2 or x > 68.4 or x < -68.4):
-                usedUPB = self.recover(usedUPB)
+                self.recover()
                 print("recover")
             else:
                 diff_x, diff_y = self.get_distance_to_opponent(player1.get_position())
@@ -148,5 +146,3 @@ class PikachuAgent(BaseAgent):
                     print("none")
         else:
             self.reset_buttons()
-
-
