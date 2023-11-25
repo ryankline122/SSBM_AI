@@ -98,7 +98,7 @@ class DKAgent(BaseAgent):
             "tilt_left": 0.5,
             "tilt_right": 0.5,
             "smash_up": 0.0,
-            "smash_down": 0.2,
+            "smash_down": 0.3,
             "smash_left": 0.3,
             "smash_right": 0.3,
             "grab": 0.3,
@@ -178,7 +178,6 @@ class DKAgent(BaseAgent):
             if curr_agent_percentage > prev_agent_percentage:
                 weights['block'] = 0.6
             
-        
         return weights
 
     def weighted_random(self, weights):
@@ -261,13 +260,12 @@ class DKAgent(BaseAgent):
             super().action("jump")
 
         # Adjust Y position
-        # TODO: Still seems to be an issue here sometimes
         frames_since_first_down = self.gamestate.frame - self.down_frame
         if diff_y > 10:
-            if super().get_buttons()["StickY"] != -1:
-                # self.down_frame = self.gamestate.frame
-                # self.down_active = True
+            if super().get_buttons()["StickY"] != -1 and frames_since_first_down > 3:
+                self.down_frame = self.gamestate.frame
+                self.down_active = True
                 super().action("down")
             else:
                 # Prevents it from getting stuck if unable to drop from platform initially
-                super().action("jump")
+                super().action("left")

@@ -80,7 +80,7 @@ if __name__ == "__main__":
     try:
         # Player 1
         get_player_addresses(0x80453130)
-        update_config("P1", 0x80453130)
+        update_config('P1', 0x80453130)
 
         # Player 3
         get_player_addresses(0x80454E50)
