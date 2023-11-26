@@ -1,4 +1,5 @@
 # Super Smash Bros Melee AI
+## Ryan Kline, Matthew Newhouse
 The goal of this project is to develop inteligent agents that play Super Smash Bros. Melee on the Dolphin Emulator.
 
 ## Getting Started
@@ -37,13 +38,7 @@ In addition to the desktop application, we can also use the dolphin memory engin
 
 All memory addresses (constant or not) are stored in `python-stubs\src\config.ini`
 
-To install, first setup a python virtual environment within the `src/` folder
-
-```python -m venv .venv```<br>
-```source .venv/bin/activate``` (Linux/macOS) <br>
-```.\.venv\Scripts\activate``` (Windows)
-
-Then install with `pip install dolphin-memory-engine`
+The python package can be installed with `pip install dolphin-memory-engine`
 
 ### Dealing with Pointers
 For some variables, the memory address is a pointer that can have multiple levels and the final address is not always constant between games. For example, the (x,y) position is stored at a different address when playing on Battlefield vs Pokemon Stadium
