@@ -29,7 +29,7 @@ class PikachuAgent(BaseAgent):
         if self.jumped and frames_since_last_jump > 20:
             self.jumped = False
 
-        #Keeps agent from getting stuck when oppoent is on end of platform
+        #Keeps agent from getting stuck when oppoent is on end of platform.
         target_x = 10 if diff_y >= 0 else 5
 
         # Adjust X position
@@ -51,57 +51,56 @@ class PikachuAgent(BaseAgent):
         Performs actions to recover.
         """
         x, y = super().get_position()
-        #print(x)
 
-        #print("self.usedUPB: " + str(self.usedUPB))
-
+        #If below stage or close to, but off stage, useUPB (if available).
         if( (y < -5 or (x < -70 and x > -75) or (x > 70 and x < 75)) and not self.usedUPB ):
             super().action("up_special")
             self.usedUPB = True
-            #print("b_up")
+        #Move left if off right side of stage.
         elif( x > 68.4 and x < 75):
             if (not self.usedUPB):
                 super().action("up_special")
                 self.usedUPB = True
             else:
                 super().action("left")
+        #Use left-special if far off right side of stage.
         elif(x > 75):
             if (not self.usedUPB):
                 super().action("left_special")
-                #print("b_left")
             else:
                 super().action("up_left")
-                #print("up_left")
-                #print("RESET: " + str(x))
                 self.usedUPB = False
+        #Move right if off left side of stage.
         elif( x < -68.4 and x > -75):
             if (not self.usedUPB):
                 super().action("up_special")
                 self.usedUPB = True
             else:
                 super().action("right")
+        #Use right-special if far off left side of stage.
         elif (x < -75):
             if (not self.usedUPB):
                 super().action("right_special")
-                #print("b_right")
             else:
                 super().action("up_right")
-                #print("up_right")
-                #print("RESET: " + str(x))
                 self.usedUPB = False
         else:
             super().reset_buttons()
-            #print("none")
 
     def main(self, player1):
 
         diff_x, diff_y = self.get_distance_to_opponent(player1.get_position())
 
+        #Only move on some frames to ensure the agent is locked in place.
         if self.gamestate.frame % 8 != 0:
             x, y = self.get_position()
             x2, y2 = player1.get_position()
+
+            #Reset UpB if on stage.
             if (x < 68.4 and x > -68.4) and self.usedUPB:
                 self.usedUPB = False
+            
+            #Logic for falling down (want to avoid falling directly onto opponent).
             if (y > 25 and x < 65 and x > -65 and y2 < y):
                 if((diff_x < 10 and diff_x > -10) and y > 50):
                     list = [1, 2, 3]
@@ -114,21 +113,24 @@ class PikachuAgent(BaseAgent):
                         self.action("right_special")
                 else:
                     self.action("down")
-                #print("fall")
+
+            #Recover if below or off stage.
             if (y < -2 or x > 68.4 or x < -68.4):
                 self.recover()
-                #print("recover")
             else:
+
+                #Move left when at right edge.
                 if (x < 70 and x > 65):
                     self.action("left_special")
-                    #print("edge left")
+                #Move right when at left edge.
                 elif (x > -70 and x < -65):
                     self.action("right_special")
                     #print("edge right")
+                #Attack using a random move when close to the opponent.
                 elif ((diff_x < 13 and diff_x > -13) and (diff_y < 13 and diff_y > -13) and self.gamestate.frame % 4 != 0):
                     list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
                     choice = random.choice(list)
-                    #print("attack")
+                    #Use smash attack when opponent is at high percentages.
                     if (player1.get_percentage() > 70):
                         if (choice <= 6):
                             self.action("smash_up")
@@ -141,23 +143,25 @@ class PikachuAgent(BaseAgent):
                             self.action("tilt_down")
                         elif (choice == 14):
                             self.action("grab")
+                #If on stage...
                 elif (x < 65 and x > -65):
+                    #Use Thunder if the opponent is above and has similar x-value.
                     if (y > 0 and (y2) > y + 20 and (diff_x < 10 and diff_x > -10) and (
                             (x > -40 and x < 40) or y > 60)):
                         self.action("down_special")
-                        #print("thunder")
+                    #Turn to face opponent.
                     if diff_x > 0 and self.get_facing_direction() == "right":
                         super().action("left")
                     elif diff_x < 0 and self.get_facing_direction() == "left":
                         super().action("right")
+                    #Use Thunder Jolt when far away horizontally, but on similar y-level.
                     elif (y2 < y + 5) and x2 > x + 40:
                         self.action("neutral_special")
-                        #print("special")
+                    #Otherwise, move towards the opponent.
                     else:
                         self.go_to(player1.get_position())
                         #print("goto")
                 else:
                     self.reset_buttons()
-                    #print("none")
         else:
             self.reset_buttons()
